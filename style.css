@@ -1265,3 +1265,100 @@ body {
     font-size: 9px;
   }
 }
+
+/* ========================================================================== 
+   v6 手機修正：通關/失敗 UI 不超出螢幕，Canvas 物件與血條視覺對齊
+   ========================================================================== */
+@media (pointer: coarse), (max-width: 900px), (max-height: 560px) {
+  .overlay-screen {
+    padding: 6px !important;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .glass-panel {
+    width: min(96vw, 720px) !important;
+    max-width: 96vw !important;
+    max-height: calc(100dvh - 12px) !important;
+    padding: 14px 16px !important;
+    border-radius: 14px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .victory-panel,
+  .defeat-panel {
+    max-height: calc(100dvh - 12px) !important;
+  }
+
+  .victory-icon,
+  .defeat-icon {
+    font-size: 42px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .result-title {
+    font-size: clamp(20px, 5vw, 28px) !important;
+    margin-bottom: 8px !important;
+    line-height: 1.15 !important;
+  }
+
+  .result-desc {
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 12px !important;
+    max-width: 92vw !important;
+  }
+
+  .action-buttons {
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .menu-btn {
+    padding: 9px 14px !important;
+    font-size: 13px !important;
+    min-width: 120px;
+  }
+
+  /* 避免 Canvas 因瀏覽器自動對齊/基線留下 1px 空隙，導致觸控座標看起來偏移 */
+  .battle-area {
+    line-height: 0;
+  }
+
+  #gameCanvas {
+    display: block;
+    vertical-align: top;
+    image-rendering: auto;
+  }
+}
+
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 430px) {
+  .glass-panel {
+    padding: 10px 12px !important;
+    max-height: calc(100dvh - 8px) !important;
+  }
+
+  .victory-icon,
+  .defeat-icon {
+    font-size: 32px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .result-title {
+    font-size: 20px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .result-desc {
+    font-size: 12px !important;
+    margin-bottom: 8px !important;
+    line-height: 1.25 !important;
+  }
+
+  .menu-btn {
+    padding: 7px 12px !important;
+    font-size: 12px !important;
+  }
+}

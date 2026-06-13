@@ -275,7 +275,16 @@ const CANVAS_SCALE = LOGICAL_CANVAS_WIDTH / 1920;
 const GRID_START_X = Math.round(240 * CANVAS_SCALE); // 地球基地寬度
 const GRID_END_X = Math.round(1680 * CANVAS_SCALE);  // 戰場右邊界
 const GRID_COL_WIDTH = (GRID_END_X - GRID_START_X) / 9;
-const GRID_ROW_HEIGHT = LOGICAL_CANVAS_HEIGHT / 5
+const GRID_ROW_HEIGHT = LOGICAL_CANVAS_HEIGHT / 5;
+
+// 依照目前 Canvas 邏輯尺寸自動縮放角色與血條，避免手機版壓縮後位置看起來偏移
+const UNIT_FONT_SIZE = Math.round(GRID_ROW_HEIGHT * 0.62);
+const ENEMY_FONT_SIZE = Math.round(GRID_ROW_HEIGHT * 0.62);
+const BOSS_FONT_SIZE = Math.round(GRID_ROW_HEIGHT * 0.88);
+const DEFENSE_HP_BAR_W = Math.round(GRID_COL_WIDTH * 0.56);
+const ENEMY_HP_BAR_W = Math.round(GRID_COL_WIDTH * 0.52);
+const BOSS_HP_BAR_W = Math.round(GRID_COL_WIDTH * 0.82);
+const HP_BAR_H = Math.max(5, Math.round(GRID_ROW_HEIGHT * 0.065));
 
 // 靜態背景快取：格線、基地、工廠區不需要每一幀重畫，可降低 Canvas 負擔
 let gridCacheCanvas = null;
@@ -549,7 +558,7 @@ class Defense {
     else if (this.type === "recycleCannon") {
       // 檢查此路線右側是否有敵人，且子彈未達上限
       if (projectiles.length < MAX_PROJECTILES && hasEnemyInRow(this.row, this.x)) {
-        projectiles.push(new Projectile(this.x + 40, this.y - 10, this.row, this.damage));
+        projectiles.push(new Projectile(this.x + Math.round(GRID_COL_WIDTH * 0.25), this.y - Math.round(GRID_ROW_HEIGHT * 0.08), this.row, this.damage));
       }
     } 
     else if (this.type === "forestGuardian") {
@@ -594,17 +603,18 @@ class Defense {
       ctx.shadowColor = "#e74c3c";
     }
 
-    ctx.font = "75px sans-serif";
+    const size = UNIT_FONT_SIZE;
+    ctx.font = `${size}px sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(this.emoji, this.x, this.y + 5);
+    ctx.fillText(this.emoji, this.x, this.y + Math.round(size * 0.04));
 
-    // 血條
+    // 血條：跟著角色大小縮放，手機版不會看起來離角色太遠
     if (this.hp < this.maxHp) {
-      const barW = 100;
-      const barH = 10;
+      const barW = DEFENSE_HP_BAR_W;
+      const barH = HP_BAR_H;
       const bx = this.x - barW / 2;
-      const by = this.y - 65;
+      const by = this.y - Math.round(size * 0.78);
       
       ctx.fillStyle = "rgba(231, 76, 60, 0.4)";
       ctx.fillRect(bx, by, barW, barH);
@@ -725,18 +735,18 @@ class Enemy {
       ctx.shadowColor = "#ffffff";
     }
 
-    const size = this.type === "boss" ? 110 : 75;
+    const size = this.type === "boss" ? BOSS_FONT_SIZE : ENEMY_FONT_SIZE;
     ctx.font = `${size}px sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(this.emoji, this.x, this.y + 5);
+    ctx.fillText(this.emoji, this.x, this.y + Math.round(size * 0.04));
 
-    // 血條
+    // 血條：依角色大小定位，避免手機版縮放後血條與敵人分離
     if (this.hp < this.maxHp) {
-      const barW = this.type === "boss" ? 140 : 90;
-      const barH = 8;
+      const barW = this.type === "boss" ? BOSS_HP_BAR_W : ENEMY_HP_BAR_W;
+      const barH = HP_BAR_H;
       const bx = this.x - barW / 2;
-      const by = this.y - (this.type === "boss" ? 75 : 55);
+      const by = this.y - Math.round(size * 0.70);
       
       ctx.fillStyle = "rgba(0,0,0,0.5)";
       ctx.fillRect(bx, by, barW, barH);
@@ -1010,13 +1020,14 @@ function drawSelectionHighlight() {
       
       // 半透明 Emoji 預覽
       ctx.globalAlpha = 0.5;
-      ctx.font = "75px sans-serif";
+      const previewSize = UNIT_FONT_SIZE;
+      ctx.font = `${previewSize}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(
         UNIT_TYPES[selectedUnitType].emoji, 
         x + GRID_COL_WIDTH / 2, 
-        y + GRID_ROW_HEIGHT / 2 + 5
+        y + GRID_ROW_HEIGHT / 2 + Math.round(previewSize * 0.04)
       );
     } else {
       ctx.fillStyle = "rgba(231, 76, 60, 0.15)";
